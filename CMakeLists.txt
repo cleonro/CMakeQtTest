@@ -135,16 +135,16 @@ endforeach()
 # An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
 # Note that the image plugins depend on QtSvg and QtXml, and it got those copied
 # over.
-#INSTALL(CODE "
-#    file(GLOB_RECURSE QTPLUGINS
-#      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+INSTALL(CODE "
+	file(GLOB_RECURSE QTPLUGINS
+	  \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+	include(BundleUtilities)
+	fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"${DIRS}\")
+	" COMPONENT Runtime)
+#install(CODE "
 #    include(BundleUtilities)
-#    fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"${DIRS}\")
+#    fixup_bundle(\"${APPS}\" \"${QTPLUGINS}\" \"${DIRS}\")
 #    " COMPONENT Runtime)
-install(CODE "
-    include(BundleUtilities)
-    fixup_bundle(\"${APPS}\" \"${QTPLUGINS}\" \"${DIRS}\")
-    " COMPONENT Runtime)
 
 
 # To Create a package, one can run "cpack -G DragNDrop CPackConfig.cmake" on Mac OS X
