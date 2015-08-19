@@ -9,8 +9,8 @@
 
 #include "TestForm.h"
 // #include <QtGui>
-#include <QtGui/QFileDialog>
-#include <QtGui/QLabel>
+#include <QFileDialog>
+#include <QLabel>
 
 
 TestForm::TestForm(QWidget *parent) : QDialog(parent)
