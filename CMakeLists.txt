@@ -39,9 +39,17 @@ IF(APPLE)
   SET(QTTEST_SRCS ${QTTEST_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/QtTest.icns)
 ENDIF(APPLE)
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
     set(CMAKE_INSTALL_RPATH "$ORIGIN")
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+else()
+    if(APPLE)
+
+        #set(CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
+        #set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+        #message("APPLE CMAKE INSTALL RPATH: " ${CMAKE_INSTALL_RPATH})
+
+    endif()
 endif()
 #?
 #LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/bin/plugins/platforms" isSystemDir)
@@ -89,7 +97,7 @@ SET(plugin_dest_dir bin)
 SET(qtconf_dest_dir bin)
 SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/QtTest")
 IF(APPLE)
-  SET(plugin_dest_dir QtTest.app/Contents/MacOS)
+  SET(plugin_dest_dir QtTest.app/Contents/)
   SET(qtconf_dest_dir QtTest.app/Contents/Resources)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/QtTest.app")
 ENDIF(APPLE)
@@ -127,6 +135,9 @@ message("QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
 
 get_target_property(QT_LIBRARY_DIRS Qt5::Core LOCATION)
 get_filename_component(QT_LIBRARY_DIRS ${QT_LIBRARY_DIRS} DIRECTORY)
+if(APPLE)
+    get_filename_component(QT_LIBRARY_DIRS ${QT_LIBRARY_DIRS} DIRECTORY)
+endif()
 message("QT_LIBRARY_DIRS: " ${QT_LIBRARY_DIRS})
 
 
@@ -154,6 +165,7 @@ INSTALL(CODE "
 
 # directories to look for dependencies
 SET(DIRS ${QT_LIBRARY_DIRS})
+message("DIRS: " ${DIRS})
 
 #test-remove
 message("CMAKE_SHARED_LIBRARY_SUFFIX: " ${CMAKE_SHARED_LIBRARY_SUFFIX})
@@ -169,6 +181,7 @@ endforeach()
 # An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
 # Note that the image plugins depend on QtSvg and QtXml, and it got those copied
 # over.
+if(1)
 INSTALL(CODE "
 	file(GLOB_RECURSE QTPLUGINS
 	  \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
@@ -180,6 +193,7 @@ INSTALL(CODE "
 	endif()
 	fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"${DIRS}\")
 	" COMPONENT Runtime)
+endif()
 #install(CODE "
 #    include(BundleUtilities)
 #    fixup_bundle(\"${APPS}\" \"${QTPLUGINS}\" \"${DIRS}\")
@@ -189,6 +203,8 @@ INSTALL(CODE "
 # To Create a package, one can run "cpack -G DragNDrop CPackConfig.cmake" on Mac OS X
 # where CPackConfig.cmake is created by including CPack
 # And then there's ways to customize this as well
-set(CPACK_BINARY_DRAGNDROP OFF)
+if(APPLE)
+    set(CPACK_BINARY_DRAGNDROP ON)
+endif()
 include(CPack)
 
